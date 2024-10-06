@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Store</title>
+</head>
+
+<body>
+    <div>
+        <div><input type="text" id="word" name="word"></div>
+        <div><textarea id="definition" name="definition" rows="4" cols="50"></textarea></div>
+        <div><button type="button" onclick="post()">Submit</button></div>
+    </div>
+
+    <div id="feedback"></div>
+
+</body>
+
+</html>
+
+<script>
+    const xhttp = new XMLHttpRequest();
+    const endPointRoot = "http://localhost:8000/api/definitions/";
+    function validate(word, def) {
+        //validation check, this is chatGPT's code
+        if (word == "" || def == "") {
+            console.log("Empty inputs");
+            alert("Empty inputs");
+            return false;
+
+        } else if (!word.match("^[a-zA-Z]*$")) { //only letters A-Z allowed
+            console.log("Only letters A-Z allowed!");
+            alert("Only letters A-Z allowed!");
+            return false;
+
+        } else if (/\d/.test(word)) {
+            console.log("Numbers cannot be included in word!");
+            alert("Numbers cannot be included in word!");
+            return false;
+
+        } else if (word.indexOf(' ') != -1) {
+            console.log("Please input only ONE word at a time(NO SPACES)");
+            alert("Please input only ONE word at a time(NO SPACES)");
+            return false;
+
+        }
+        return true;
+    }
+    async function post() {
+        reset();
+        let word = document.getElementById('word').value.trim();
+        let def = document.getElementById('definition').value.trim();
+        let feedback = document.getElementById("feedback");
+
+        let params = `?word=${word}&definition=${def}`;
+
+        if (!validate(word, def)) {
+            feedback.innerHTML = "Invalid inputs! Please try again";
+            return;
+        }
+
+        //try {
+        /* const response = await fetch(endPointRoot + params, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ word, definition: def })
+        });
+        const data = await response.json();
+        console.log(data);
+        feedback.innerHTML = data.success;
+    } catch (error) {
+        console.log(error);
+        feedback.innerHTML = "Error: " + error;
+    } */
+
+
+        xhttp.open("POST", endPointRoot + params, true);
+        xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+        xhttp.send(params);
+        xhttp.onreadystatechange = function () {
+            if (this.readyState == 4 && this.status == 201) {
+                let obj = JSON.parse(this.responseText);
+                console.log(obj.success)
+            } else {
+                let obj = JSON.parse(this.responseText);
+                feedback.innerHTML = obj
+            }
+        };
+
+    }
+
+    //clear txt
+    function reset() {
+        document.getElementById("feedback").innerHTML = "";
+    }
+
+</script>

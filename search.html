@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search</title>
+</head>
+
+<body>
+    <div>
+        <input type="text" id="search" name="search">
+        <br>
+        <button type="button" onclick="get()">Submit</button>
+    </div>
+
+    <div>
+        <p id="displayword"></p>
+        <p id="displaydef"></p>
+    </div>
+    <p id="feedback"></p>
+
+
+</body>
+
+</html>
+<script>
+    const xhttp = new XMLHttpRequest();
+    let requestCount = 0;
+    const endPointRoot = "http://localhost:9000/api/definitions/";
+    const feedback = document.getElementById("feedback");
+    function validate(searchWord) {
+        //validation check
+        if (searchWord == "") {
+            alert("Please enter a word");
+            return false;
+
+        } else if (/\d/.test(searchWord)) {
+            alert("Numbers cannot be included in word!");
+            return false;
+
+        } else if (searchWord.indexOf(' ') != -1) {
+            alert("Please input only ONE word at a time(NO SPACES)");
+            return false;
+
+        } else if (!searchWord.match("^[a-zA-Z]*$")) {
+            alert("Only letters A-Z allowed!");
+            return false;
+        }
+    }
+
+    async function get() {
+        reset();
+
+        let searchWord = document.getElementById('search').value.trim();
+        requestCount++;
+
+        if (!validate(searchWord)) {
+            feedback.innerHTML = "Request#" + requestCount + ": word " + searchWord + "not found.";
+            return;
+        }
+
+        try {
+            const response = await fetch(endPointRoot + searchWord);
+            const data = await response.json();
+            console.log(data);
+            document.getElementById("displayword").innerHTML = "Word: " + data.word;
+            document.getElementById("displaydef").innerHTML = "Definition: " + data.definition;
+        } catch (error) {
+            console.log(error);
+            document.getElementById("displayword").innerHTML = "Error: " + error;
+        }
+
+    }
+
+    //clear displays
+    function reset() {
+        document.getElementById("displayword").innerHTML = "";
+        document.getElementById("displaydef").innerHTML = "";
+    }
+
+</script>
