@@ -23,7 +23,6 @@
 
 <script>
     const xhttp = new XMLHttpRequest();
-    const endPointRoot = "http://localhost:8000/api/definitions/";
     function validate(word, def) {
         //validation check, this is chatGPT's code
         if (word == "" || def == "") {
@@ -49,54 +48,48 @@
         }
         return true;
     }
+
+
     async function post() {
         reset();
         let word = document.getElementById('word').value.trim();
         let def = document.getElementById('definition').value.trim();
         let feedback = document.getElementById("feedback");
-
-        let params = `?word=${word}&definition=${def}`;
-
+        console.log(JSON.stringify({ word: word, definition: def }))
         if (!validate(word, def)) {
             feedback.innerHTML = "Invalid inputs! Please try again";
             return;
         }
 
-        //try {
-        /* const response = await fetch(endPointRoot + params, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ word, definition: def })
-        });
-        const data = await response.json();
-        console.log(data);
-        feedback.innerHTML = data.success;
-    } catch (error) {
-        console.log(error);
-        feedback.innerHTML = "Error: " + error;
-    } */
+        const payload = {
+            word: word,
+            definition: def
+        }
+
+        const params = new URLSearchParams({ word: word, definition: def }).toString();
+        const url = `https://comp4357labs.onrender.com/4/api/definitions?${params}`;
+
+        try {
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(payload)
+            });
 
 
-        xhttp.open("POST", endPointRoot + params, true);
-        xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-        xhttp.send(params);
-        xhttp.onreadystatechange = function () {
-            if (this.readyState == 4 && this.status == 201) {
-                let obj = JSON.parse(this.responseText);
-                console.log(obj.success)
-            } else {
-                let obj = JSON.parse(this.responseText);
-                feedback.innerHTML = obj
-            }
-        };
-
+            const data = await response.text();
+            feedback.innerHTML = data;
+        } catch (error) {
+            console.log(error);
+            feedback.innerHTML = "Error: " + error;
+        }
     }
 
     //clear txt
     function reset() {
-        document.getElementById("feedback").innerHTML = "";
+        feedback.innerHTML = "";
     }
 
 </script>
