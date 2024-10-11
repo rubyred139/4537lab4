@@ -10,11 +10,18 @@
 
 <body>
     <div>
-        <div><input type="text" id="word" name="word"></div>
-        <div><textarea id="definition" name="definition" rows="4" cols="50"></textarea></div>
-        <div><button type="button" onclick="post()">Submit</button></div>
+        <div style="display: flex; align-items: center; margin-bottom: 10px;">
+            <label style="width: 80px;">Word: </label>
+            <input type="text" id="word" name="word">
+        </div>
+        <div style="display: flex; align-items: center; margin-bottom: 10px;">
+            <label style="width: 80px;">Definition:</label>
+            <textarea id="definition" name="definition" rows="4" cols="25"></textarea>
+        </div>
+        <div>
+            <button type="button" onclick="post()">Submit</button>
+        </div>
     </div>
-
     <div id="feedback"></div>
 
 </body>
